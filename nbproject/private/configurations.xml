@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="100">
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Release" type="1">
@@ -24,8 +24,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>mpiexec -n 2 "${OUTPUT_PATH}" mpi.in</runcommandpicklistitem>
-          <runcommandpicklistitem>mpiexec -np 2 "${OUTPUT_PATH}" mpi.in</runcommandpicklistitem>
           <runcommandpicklistitem>mpiexec -np 20 "${OUTPUT_PATH}" mpi.in</runcommandpicklistitem>
           <runcommandpicklistitem>mpiexec -np 20 "${OUTPUT_PATH}" mpi.in,old</runcommandpicklistitem>
           <runcommandpicklistitem>mpiexec -np 20 "${OUTPUT_PATH}" mpi.in,orig</runcommandpicklistitem>
@@ -34,8 +32,10 @@
           <runcommandpicklistitem>mpiexec -np  "${OUTPUT_PATH}" mpi.in.orig</runcommandpicklistitem>
           <runcommandpicklistitem>mpiexec -np 4 "${OUTPUT_PATH}" mpi.in.orig</runcommandpicklistitem>
           <runcommandpicklistitem>mpiexec -np 1 "${OUTPUT_PATH}" mpi.in.orig</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" test_exp.in</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>mpiexec -np 1 "${OUTPUT_PATH}" mpi.in.orig</runcommand>
+        <runcommand>"${OUTPUT_PATH}" test_exp.in</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>
@@ -67,10 +67,13 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" test_exp.in</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" kdd_exp_1.in</runcommandpicklistitem>
+          <runcommandpicklistitem>mpiexec -np 2 "${OUTPUT_PATH}" mpi.in</runcommandpicklistitem>
+          <runcommandpicklistitem>"mpiexec -np 2 ${OUTPUT_PATH}" test_exp.in</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" test_exp_others.in</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" test_exp.in</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" kdd_exp_1.in</runcommand>
+        <runcommand>"${OUTPUT_PATH}" test_exp.in</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

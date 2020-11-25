@@ -61,7 +61,7 @@ void Update_BC(
             BC_vec[i] += dBC_vec[i];
         }
     } else if(comp_type == BCC) {
-        component_t comp;
+        component_t comp; // this is the biconnected components of G' that edge e belongs to
         comp.comp_type = BCC;
         if(op == INSERTION) {
             //IMP: assumes @e is not in @graph, @e will not be in @comp
@@ -94,11 +94,7 @@ void Update_BC(
             node_id_t actual_node_id = comp.subgraph.inout_label_map[i];
             BC_vec[actual_node_id] += dBC_vec[i];
         }
-    } else if(comp_type == MUC) {
-        //TO BE IMPLEMENTED
     }
-   
-    
 }
 
 void iCentral(
@@ -140,7 +136,7 @@ void parallel_iCentral(
             all_sources_vec.push_back(s);
         }
     }
-    //MPI shit goes here:
+    //MPI goes here:
     //all_sources_vec at each machine must have only its share of the sources
     //then continue normally, note that each process will finish its shit
     //and have it's contribution in its dBC_vec
@@ -194,9 +190,11 @@ void parallel_iCentral(
         }
     }
     
+    /// For MPI programming this section must be uncommented ---
+    
     //now dBC_vec of each machine is ready.
     //master gets and accumulates all dBC_vec from everyone
-    //printf("R[%d] done\n", rank);
+//    printf("R[%d] done\n", rank);
 //    if(rank == 0) {
 //        //receive dBC_vec from everyone and accumulate
 //        timer tm;
@@ -215,6 +213,8 @@ void parallel_iCentral(
 //        //just send dBC_vec
 //        MPI_Send(&dBC_vec[0], dBC_vec.size(), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
 //    }
+    
+    /// --- For MPI programming above this section should be commented out
     
     
     FILE* fout = fopen("dBC", "w");

@@ -7,21 +7,21 @@ CND_BASEDIR=`pwd`
 CND_BUILDDIR=build
 CND_DISTDIR=dist
 # Release configuration
-CND_PLATFORM_Release=GNU-Linux-x86
-CND_ARTIFACT_DIR_Release=dist/Release/GNU-Linux-x86
-CND_ARTIFACT_NAME_Release=fjbc_mpi
-CND_ARTIFACT_PATH_Release=dist/Release/GNU-Linux-x86/fjbc_mpi
-CND_PACKAGE_DIR_Release=dist/Release/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Release=fjbcmpi.tar
-CND_PACKAGE_PATH_Release=dist/Release/GNU-Linux-x86/package/fjbcmpi.tar
+CND_PLATFORM_Release=OpenMPI-Linux
+CND_ARTIFACT_DIR_Release=dist/Release/OpenMPI-Linux
+CND_ARTIFACT_NAME_Release=icentral
+CND_ARTIFACT_PATH_Release=dist/Release/OpenMPI-Linux/icentral
+CND_PACKAGE_DIR_Release=dist/Release/OpenMPI-Linux/package
+CND_PACKAGE_NAME_Release=icentral.tar
+CND_PACKAGE_PATH_Release=dist/Release/OpenMPI-Linux/package/icentral.tar
 # Debug configuration
-CND_PLATFORM_Debug=GNU-Linux-x86
-CND_ARTIFACT_DIR_Debug=dist/Debug/GNU-Linux-x86
-CND_ARTIFACT_NAME_Debug=fjbc_mpi
-CND_ARTIFACT_PATH_Debug=dist/Debug/GNU-Linux-x86/fjbc_mpi
-CND_PACKAGE_DIR_Debug=dist/Debug/GNU-Linux-x86/package
-CND_PACKAGE_NAME_Debug=fjbcmpi.tar
-CND_PACKAGE_PATH_Debug=dist/Debug/GNU-Linux-x86/package/fjbcmpi.tar
+CND_PLATFORM_Debug=OpenMPI-Linux
+CND_ARTIFACT_DIR_Debug=dist/Debug/OpenMPI-Linux
+CND_ARTIFACT_NAME_Debug=icentral
+CND_ARTIFACT_PATH_Debug=dist/Debug/OpenMPI-Linux/icentral
+CND_PACKAGE_DIR_Debug=dist/Debug/OpenMPI-Linux/package
+CND_PACKAGE_NAME_Debug=icentral.tar
+CND_PACKAGE_PATH_Debug=dist/Debug/OpenMPI-Linux/package/icentral.tar
 #
 # include compiler specific variables
 #

@@ -14,14 +14,14 @@ GREP=grep
 NM=nm
 CCADMIN=CCadmin
 RANLIB=ranlib
-CC=gcc
+CC=mpicc
 CCC=mpic++
 CXX=mpic++
 FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=OpenMPI-Linux
 CND_DLIB_EXT=so
 CND_CONF=Release
 CND_DISTDIR=dist
@@ -57,8 +57,8 @@ OBJECTFILES= \
 CFLAGS=
 
 # CC Compiler Flags
-CCFLAGS=-w -pthread -std=c++11
-CXXFLAGS=-w -pthread -std=c++11
+CCFLAGS=-w -pthread -std=c++11 -lm
+CXXFLAGS=-w -pthread -std=c++11 -lm
 
 # Fortran Compiler Flags
 FFLAGS=
@@ -71,88 +71,88 @@ LDLIBSOPTIONS=
 
 # Build Targets
 .build-conf: ${BUILD_SUBPROJECTS}
-	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/fjbc_mpi
+	"${MAKE}"  -f nbproject/Makefile-${CND_CONF}.mk ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/icentral
 
-${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/fjbc_mpi: ${OBJECTFILES}
+${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/icentral: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
-	mpic++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/fjbc_mpi ${OBJECTFILES} ${LDLIBSOPTIONS} -pthread -std=c++11
+	mpic++ -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/icentral ${OBJECTFILES} ${LDLIBSOPTIONS} -pthread -std=c++11
 
-${OBJECTDIR}/src/_bc.o: src/_bc.cc 
+${OBJECTDIR}/src/_bc.o: src/_bc.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/_bc.o src/_bc.cc
 
-${OBJECTDIR}/src/_bc_mem.o: src/_bc_mem.cc 
+${OBJECTDIR}/src/_bc_mem.o: src/_bc_mem.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/_bc_mem.o src/_bc_mem.cc
 
-${OBJECTDIR}/src/bc.o: src/bc.cc 
+${OBJECTDIR}/src/bc.o: src/bc.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bc.o src/bc.cc
 
-${OBJECTDIR}/src/bcc_delta.o: src/bcc_delta.cc 
+${OBJECTDIR}/src/bcc_delta.o: src/bcc_delta.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bcc_delta.o src/bcc_delta.cc
 
-${OBJECTDIR}/src/bcc_scratch.o: src/bcc_scratch.cc 
+${OBJECTDIR}/src/bcc_scratch.o: src/bcc_scratch.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bcc_scratch.o src/bcc_scratch.cc
 
-${OBJECTDIR}/src/bicon.o: src/bicon.cc 
+${OBJECTDIR}/src/bicon.o: src/bicon.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bicon.o src/bicon.cc
 
-${OBJECTDIR}/src/experiments.o: src/experiments.cc 
+${OBJECTDIR}/src/experiments.o: src/experiments.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/experiments.o src/experiments.cc
 
-${OBJECTDIR}/src/graph_hash_t.o: src/graph_hash_t.cc 
+${OBJECTDIR}/src/graph_hash_t.o: src/graph_hash_t.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/graph_hash_t.o src/graph_hash_t.cc
 
-${OBJECTDIR}/src/graph_t.o: src/graph_t.cc 
+${OBJECTDIR}/src/graph_t.o: src/graph_t.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/graph_t.o src/graph_t.cc
 
-${OBJECTDIR}/src/iter_info_t.o: src/iter_info_t.cc 
+${OBJECTDIR}/src/iter_info_t.o: src/iter_info_t.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/iter_info_t.o src/iter_info_t.cc
 
-${OBJECTDIR}/src/main.o: src/main.cc 
+${OBJECTDIR}/src/main.o: src/main.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cc
 
-${OBJECTDIR}/src/mcb_find.o: src/mcb_find.cc 
+${OBJECTDIR}/src/mcb_find.o: src/mcb_find.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mcb_find.o src/mcb_find.cc
 
-${OBJECTDIR}/src/paper_exp.o: src/paper_exp.cc 
+${OBJECTDIR}/src/paper_exp.o: src/paper_exp.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paper_exp.o src/paper_exp.cc
 
-${OBJECTDIR}/src/qube.o: src/qube.cc 
+${OBJECTDIR}/src/qube.o: src/qube.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/qube.o src/qube.cc
 
-${OBJECTDIR}/src/subgraph_t.o: src/subgraph_t.cc 
+${OBJECTDIR}/src/subgraph_t.o: src/subgraph_t.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/subgraph_t.o src/subgraph_t.cc
 
-${OBJECTDIR}/src/utility.o: src/utility.cc 
+${OBJECTDIR}/src/utility.o: src/utility.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/utility.o src/utility.cc
@@ -163,7 +163,6 @@ ${OBJECTDIR}/src/utility.o: src/utility.cc
 # Clean Targets
 .clean-conf: ${CLEAN_SUBPROJECTS}
 	${RM} -r ${CND_BUILDDIR}/${CND_CONF}
-	${RM} ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/fjbc_mpi
 
 # Subprojects
 .clean-subprojects:

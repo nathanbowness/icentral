@@ -182,8 +182,8 @@ void timing__Update_BC_graph(
     BC_vec.resize(graph.size());
     if(do_brandes) {
         tm.start();
-        //fast_brandes_BC(graph, BC_vec);
-        BC_vec = brandes_bc(graph);
+        fast_brandes_BC(graph, BC_vec);  // this is def faster, uses components
+//        BC_vec = brandes_bc(graph);
         tm.stop();
         brandes_time = tm.interval();
     }
@@ -198,7 +198,7 @@ void timing__Update_BC_graph(
         edge_t e = edge_vec[i];
         if(del_edge) graph.remove_edge(e.first, e.second);
         tm.start();
-        Update_BC(BC_vec, graph, algo_flag, e, num_threads, op);
+        Update_BC(BC_vec, graph, algo_flag, e, num_threads, op); // aglo_flag is BCC for now
         tm.stop();
         double e_time = tm.interval();
         tm_vec.push_back(e_time);
@@ -206,7 +206,7 @@ void timing__Update_BC_graph(
         speedup_vec.push_back(e_speedup);
         
         if(rank == 0) {
-            printf("e(%-6d,%-6d)  tm[%.2f]  sup[%.2f]\n",
+            printf("e(%-6d,%-6d)  time[%.2f]  speed-up[%.2f]\n",
                     e.first,
                     e.second,
                     e_time,
