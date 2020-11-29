@@ -45,28 +45,17 @@ void Update_BC(
         comp_type_t      comp_type,
         edge_t           e,
         int              num_threads,
-        operation_t      op
+        operation_t      operation
         )
 {
-    if(comp_type == GRAPH) {
-        component_t comp;
-        comp.comp_type = GRAPH;
-        comp.subgraph.fill_graph(graph);
-        vector<double> dBC_vec;
-        if(num_threads == 1)
-            iCentral(dBC_vec, comp, e, op);
-        else
-            parallel_iCentral(dBC_vec, comp, e, num_threads, op);
-        for(int i = 0; i < dBC_vec.size(); ++i) {
-            BC_vec[i] += dBC_vec[i];
-        }
-    } else if(comp_type == BCC) {
-        component_t comp; // this is the biconnected components of G' that edge e belongs to
+        // comp - is the biconnected component of G' that edge e belongs to, Be'
+        component_t comp; 
         comp.comp_type = BCC;
-        if(op == INSERTION) {
+        
+        if(operation == INSERTION) {
             //IMP: assumes @e is not in @graph, @e will not be in @comp
             graph.find_edge_bcc(comp, e);
-        } else if(op == DELETION) {
+        } else if(operation == DELETION) {
             
             //IMP: assumes @e is not in @graph, @e will not be in @comp
             //     (remove @e from @graph)
@@ -74,6 +63,8 @@ void Update_BC(
             graph.find_edge_bcc(comp, e);
             graph.insert_edge(e.first, e.second);
         }
+        
+        // graph has not been modifed, the edges were inserted/deleted then removed/added back
             
         //DEBUG
         //printf("BCC # vertices [%d], # edges [%d] \n", comp.subgraph.size(), comp.subgraph.edge_set.size());
@@ -81,20 +72,23 @@ void Update_BC(
         //map @e to the new edge
         e.first  = comp.subgraph.outin_label_map[e.first];
         e.second = comp.subgraph.outin_label_map[e.second];
-        if(op == DELETION) {
+        if(operation == DELETION) {
+            // Add back in the edge, so this is BCC (not BCC')
             comp.subgraph.insert_edge(e.first, e.second);
         }
         vector<double> dBC_vec;
         //comp.print();
         if(num_threads == 1)
-            iCentral(dBC_vec, comp, e, op);
+            iCentral(dBC_vec, comp, e, operation);
         else
-            parallel_iCentral(dBC_vec, comp, e, num_threads, op);
+            parallel_iCentral(dBC_vec, comp, e, num_threads, operation);
+        
+        
+        // Add up the BC values??
         for(int i = 0; i < dBC_vec.size(); ++i) {
             node_id_t actual_node_id = comp.subgraph.inout_label_map[i];
             BC_vec[actual_node_id] += dBC_vec[i];
         }
-    }
 }
 
 void iCentral(
@@ -123,13 +117,18 @@ void parallel_iCentral(
         component_t&    comp,
         edge_t          e,
         int             num_threads,
-        operation_t     op
+        operation_t     operation
         )
 {
     fill_vec<double>(dBC_vec, comp.subgraph.size(), 0.0);
+    
+    // Breadth-first search from v1, v2 of edge to compute d
     vector<int> d_src_vec, d_dst_vec;
     comp.subgraph.find_sssp(e.first, d_src_vec);
     comp.subgraph.find_sssp(e.second, d_dst_vec);
+    
+    // Add s to Q (set of nodes which the source dependencies delta_s (ds)
+    // changed with the insertion of egde e)
     vector<node_id_t> all_sources_vec;
     for(node_id_t s = 0; s < comp.subgraph.size(); ++s) {
         if(d_src_vec[s] != d_dst_vec[s]) {
@@ -138,7 +137,7 @@ void parallel_iCentral(
     }
     //MPI goes here:
     //all_sources_vec at each machine must have only its share of the sources
-    //then continue normally, note that each process will finish its shit
+    //then continue normally, note that each process will finish
     //and have it's contribution in its dBC_vec
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -146,6 +145,8 @@ void parallel_iCentral(
     MPI_Status    status;
     if(all_sources_vec.size() < size)
         return;
+    
+    // Assign a machine a subset of the all_sources_vec (set of nodes Q)
     vector<node_id_t> machine_source_vec;
     int num_s_per_machine = all_sources_vec.size()/size;
     int start, end;
@@ -158,7 +159,9 @@ void parallel_iCentral(
     }
     all_sources_vec = machine_source_vec;
     //printf("RANK[%d] -- num sources [%d]\n", rank, all_sources_vec.size());
-    //////////////
+    
+    // Assign a thread a subset of the all_sources_vec (set of nodes Q)
+    // This will split the array further if multiple threads per machine
     vector<vector<node_id_t> > thread_source_vec;
     thread_source_vec.resize(num_threads);
     if(all_sources_vec.size() < num_threads)
@@ -171,19 +174,25 @@ void parallel_iCentral(
         thread_source_vec[t].push_back(all_sources_vec[i]);
     }
     
+    // List of threads
     vector<std::thread> thread_vec;
     thread_vec.resize(num_threads);
-    //start the threads
+    
+    // delta BC for each thready
     vector<vector<double> > dBC_vec_vec;
     dBC_vec_vec.resize(num_threads);
     
+    // Start the threads
     for(int t = 0; t < num_threads; ++t) {
-        thread_vec[t] = std::thread(iCentral_block, &(dBC_vec_vec[t]), &comp, &e, &(thread_source_vec[t]), &op);
+        thread_vec[t] = std::thread(iCentral_block, &(dBC_vec_vec[t]), &comp, &e, &(thread_source_vec[t]), &operation);
     }
-    //wait for the threads to finish, then accumulate the dBC_vec
+    
+    // Wait for the threads to finish
     for(int t = 0; t < num_threads; ++t) {
         thread_vec[t].join();
     }
+    
+    // Accumulate the dBC_vec from each thread into the over dBC_vec
     for(int t = 0; t < num_threads; ++t) {
         for(node_id_t v = 0; v < dBC_vec.size(); ++v) {
             dBC_vec[v] += dBC_vec_vec[t][v];
@@ -217,6 +226,7 @@ void parallel_iCentral(
     /// --- For MPI programming above this section should be commented out
     
     
+    // Write the delta BC for each node to a file
     FILE* fout = fopen("dBC", "w");
     for(int i = 0; i < dBC_vec.size(); ++i) {
         fprintf(fout, "%f\n", dBC_vec[i]);
@@ -243,10 +253,10 @@ void iCentral_block(
 
 void iCentral_iter(
         vector<double>& dBC_vec,    // delta BC of vertices
-        component_t&    comp,       // component could be BCC, MUC, or just a graph
+        component_t&    comp,       // BCC
         node_id_t       s,          // source of the iteration
         edge_t          e,          // inserted edge
-        iter_info_t&    iter_info,  //TODO to be used later?
+        iter_info_t&    iter_info,  // 
         int             dd,
         bool            use_d_1,
         operation_t      op
@@ -266,16 +276,19 @@ void iCentral_iter(
         //    iter_info.init_new(comp.subgraph.size());//initializes the data structures required for BBFS_RBFS_d1
         //    BBFS_RBFS_d1(dBC_vec, iter_info, comp, s, e);
         //} else {
-            BBFS(iter_info, comp, s);
-            RBFS(dBC_vec, comp, s, iter_info, false, true);
-            partial_BBFS_addition(iter_info, comp, s, e);
-            RBFS(dBC_vec, comp, s, iter_info, true, false);
-        //}
+        
+        // Brandes Breadth-first search and Brandes Reverse Breadth-first Search
+        BBFS(iter_info, comp, s);
+        RBFS(dBC_vec, comp, s, iter_info, false, true);
+        partial_BBFS_addition(iter_info, comp, s, e);
+        RBFS(dBC_vec, comp, s, iter_info, true, false);
     } else if(op == DELETION) {
-            BBFS(iter_info, comp, s);
-            RBFS(dBC_vec, comp, s, iter_info, false, true);
-            partial_BBFS_deletion(iter_info, comp, s, e);
-            RBFS(dBC_vec, comp, s, iter_info, true, false);
+        
+        // Brandes Breadth-first search and Brandes Reverse Breadth-first Search
+        BBFS(iter_info, comp, s);
+        RBFS(dBC_vec, comp, s, iter_info, false, true);
+        partial_BBFS_deletion(iter_info, comp, s, e);
+        RBFS(dBC_vec, comp, s, iter_info, true, false);
     }
 
 }

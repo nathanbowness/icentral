@@ -198,7 +198,7 @@ void timing__Update_BC_graph(
         edge_t e = edge_vec[i];
         if(del_edge) graph.remove_edge(e.first, e.second);
         tm.start();
-        Update_BC(BC_vec, graph, algo_flag, e, num_threads, op); // aglo_flag is BCC for now
+        Update_BC(BC_vec, graph, BCC, e, num_threads, op); // aglo_flag is BCC for now
         tm.stop();
         double e_time = tm.interval();
         tm_vec.push_back(e_time);

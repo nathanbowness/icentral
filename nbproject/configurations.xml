@@ -13,6 +13,7 @@
       <itemPath>src/types.h</itemPath>
       <itemPath>src/unit_tests.h</itemPath>
       <itemPath>src/update_BC.h</itemPath>
+      <itemPath>src/update_BC_Shukla.h</itemPath>
       <itemPath>src/utility.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
@@ -127,6 +128,8 @@
       </item>
       <item path="src/update_BC.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="src/update_BC_Shukla.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/utility.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/utility.h" ex="false" tool="3" flavor2="0">
@@ -194,6 +197,8 @@
       <item path="src/unit_tests.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/update_BC.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/update_BC_Shukla.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/utility.cc" ex="false" tool="1" flavor2="0">
       </item>

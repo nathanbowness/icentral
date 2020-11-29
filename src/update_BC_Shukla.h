@@ -1,12 +1,18 @@
-/* 
- * File:   update_BC.h
- * Author: Nathan Bowness
- *
- * Created on November 21, 2020, 6:19 PM
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 
-#ifndef UPDATE_BC_H
-#define UPDATE_BC_H
+/* 
+ * File:   update_BC_Shukla.h
+ * Author: user
+ *
+ * Created on November 25, 2020, 3:12 PM
+ */
+
+#ifndef UPDATE_BC_SHUKLA_H
+#define UPDATE_BC_SHUKLA_H
 
 #include <iostream>
 #include <stdio.h>
@@ -27,12 +33,12 @@
  * Update a graphs Betweenness Centrality values using Jamour's algorithm
  * Output the timing details as well
  */
-void update_Graph_BC_Jamour(
+void update_Graph_BC_Shukla(
             graph_t         graph,
             vector<edge_t> edges_vec,
             bool            compare_with_brandes = true,
             int             num_threads = 1,
-            operation_t     operation = INSERTION
+            operation_t     op = INSERTION
         )
 {
     int rank, size;
@@ -61,10 +67,17 @@ void update_Graph_BC_Jamour(
                 graph.edge_set.size(),
                 brandes_time);
     }
+    
+    // Here we should potentially add all edges to the graph? At once?
+            // in Update_BC, we find the BCC the affected node is in
+    
+    
+    
     for(int i = 0; i < edges_vec.size(); ++i) {
         edge_t e = edges_vec[i];
+        
         tm.start();
-        Update_BC(BC_vec, graph, BCC, e, num_threads, operation); // Use BCC for the algorithm
+        Update_BC(BC_vec, graph, BCC, e, num_threads, op); // Use BCC for the algorithm
         tm.stop();
         double e_time = tm.interval();
         tm_vec.push_back(e_time);
@@ -92,5 +105,5 @@ void update_Graph_BC_Jamour(
         printf("Avg.time[%.2f]  Avg.speed-up[%.2f]\n\n", tm_mean, su_mean);
 }
 
-#endif /* UPDATE_BC_H */
+#endif /* UPDATE_BC_SHUKLA_H */
 

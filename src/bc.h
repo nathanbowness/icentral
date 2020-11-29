@@ -88,7 +88,7 @@ void fast_brandes_BC(
 
 /*
  * Updates the BC values in @BC_vec in place for nodes in @graph using
- * @comp_type decomposition
+ * comp_type decomposition
  * TODO: should handle all kinds of decompositions (graph/BCC/MUC)
  * IMP: assumes @BC_vec is the right size and has BC values
  */
