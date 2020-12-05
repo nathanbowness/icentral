@@ -63,15 +63,17 @@ void subgraph_t::insert_edge(node_id_t src, node_id_t dst)
 
 void subgraph_t::remove_edge(node_id_t src, node_id_t dst)
 {
-    pair<node_id_t, node_id_t> edge = make_pair(src, dst);
-    edge_set.erase(edge);
-    edge = make_pair(dst, src);
-    edge_set.erase(edge);
-    
-    vector<node_id_t>& v1 = nodes_vec[src];
-    vector<node_id_t>& v2 = nodes_vec[dst];
-    v1.erase(std::remove(v1.begin(), v1.end(), dst), v1.end());
-    v2.erase(std::remove(v2.begin(), v2.end(), src), v2.end());    
+    if(has_edge(src, dst)) {
+        pair<node_id_t, node_id_t> edge = make_pair(src, dst);
+        edge_set.erase(edge);
+        edge = make_pair(dst, src);
+        edge_set.erase(edge);
+
+        vector<node_id_t>& v1 = nodes_vec[src];
+        vector<node_id_t>& v2 = nodes_vec[dst];
+        v1.erase(std::remove(v1.begin(), v1.end(), dst), v1.end());
+        v2.erase(std::remove(v2.begin(), v2.end(), src), v2.end()); 
+    }
 }
 
 size_t subgraph_t::size()

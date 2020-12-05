@@ -363,6 +363,12 @@ struct graph_t {
                 string     operation
                 );
     
+    void    find_edge_bcc_prime(
+                component_t&    comp,
+                edge_t          e,
+                string     operation
+                );
+    
     //incremental bc with bcc stuff
     void                insert_edge_update_bc_experimental(node_id_t src,
                                                            node_id_t dst,

@@ -72,6 +72,9 @@ void update_Graph_BC_Shukla(
             operation_t     operation = INSERTION
         )
 {
+    // insert all edges into this one
+    graph_t graph_prime = graph;
+    
     int rank, size;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -107,20 +110,35 @@ void update_Graph_BC_Shukla(
     // Array of BCCs that have been affected, these are BCC in G (but were found in G')
     vector<component_t> affected_Bccs;
     
+    // add all the edges into G prime
+    for(int i = 0; i < edges_vec.size(); ++i) {
+        edge_t e = edges_vec[i];
+        
+        if(operation == INSERTION) {
+            //IMP: assumes @e is not in @graph, @e will not be in @comp
+            
+            // biconnected component of G' that edge e belongs to
+            graph_prime.insert_edge(e.first, e.second);
+        }
+    }
+    
     printf("Number of edges to insert [%d]\n", edges_vec.size());
     printf("Find all the affected BCCs\n");
     // Find all the affected BCCs for the edges
     for(int i = 0; i < edges_vec.size(); ++i) {
         
         edge_t e = edges_vec[i];
+//        printf("Edge: [%d], [%d]", e.first, e.second);
         
-        // biconnected component of G' that edge e belongs to
+        // biconnected component of G' if insertion, G if deletions
         component_t comp;
         comp.comp_type = BCC;
         
         if(operation == INSERTION) {
-            //IMP: assumes @e is not in @graph, @e will not be in @comp
-            graph.find_edge_bcc(comp, e, "INSERTION");
+            // find the BCC of G'
+            graph_prime.find_edge_bcc_prime(comp, e, "INSERTION");
+            // find the BCC of G
+            
         } else if(operation == DELETION) {
             
             //IMP: assumes @e is not in @graph, @e will not be in @comp

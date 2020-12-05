@@ -271,14 +271,15 @@ void graph_t::tmp_fun()
 /************************************************************/
 
 //IMP: assumes @e is not in the graph already
+// Used to find BCC of G for deletions
 void graph_t::find_edge_bcc(
                 component_t&    comp,
                 edge_t          e,
                 string     operation
                 )
 {
-    //a. find the bcc subgraph
-    //b. find the articulation points in bcc
+    //a. find the bcc subgraph of G
+    //b. find the articulation points in the bcc
     //c. find the sizes of the subgraphs connected to each art point
     if(has_edge(e)) {
         printf("WARNING: inserted duplicate edge!\n");
@@ -346,7 +347,7 @@ void graph_t::find_edge_bcc(
         sum_v += v;
     }
     
-    //fix art_pt_map
+    // Remove to get 
     g.remove_edge(e.first, e.second);
     
     comp.subgraph.fill_graph(g);
@@ -363,4 +364,99 @@ void graph_t::find_edge_bcc(
     comp.sum_of_bcc = sum_v;
     
     remove_edge(e.first, e.second);
+}
+
+// Used to find BCC of G' on insertions
+void graph_t::find_edge_bcc_prime(
+                component_t&    comp,
+                edge_t          e,
+                string     operation
+                )
+{
+    //a. find the bcc subgraph G'
+    //b. find the articulation points in bcc
+    //c. find the sizes of the subgraphs connected to each art point
+//    if(has_edge(e)) {
+//        printf("It has been inserted\n");
+//    }
+//    printf("The edge is ([%d], [%d])\n\n", e.first, e.second);
+//    insert_edge(e.first, e.second);
+    graph_hash_t g;
+    find_edge_bcc_subgraph(g, e.first, e.second);
+//    g.print_graph(true);
+    vector<node_id_t> art_pt_vec;
+    
+    // Find all the articulation points
+    find_art_points(art_pt_vec);
+    
+    set<node_id_t> art_pt_set; //To make art points unique
+    for(int i = 0; i < art_pt_vec.size(); ++i) {
+        art_pt_set.insert(art_pt_vec[i]);
+    }
+    
+    long sum_v = 0;
+    graph_hash_t::nodes_map_t::iterator it;
+    for(it = g.nodes_map.begin();
+        it != g.nodes_map.end();
+        ++it) {
+        node_id_t v = it->first;
+        if(art_pt_set.find(v) != art_pt_set.end()) {
+            // the node is an articulation point and it belongs to the bcc
+            // of interest, so it must be added to the art point of this bcc
+            // along with the sizes of the subgraphs it connects the bcc to
+            vector<int> subgraph_sz_vec;
+            vector<bool> visited_vec;
+            visited_vec.resize(size());
+            fill(visited_vec.begin(), visited_vec.end(), false);
+            visited_vec[v] = true;
+            vector<node_id_t> v_nbr_vec = get_nbrs(v);
+            for(int i = 0; i < v_nbr_vec.size(); ++i) {
+                node_id_t u = v_nbr_vec[i];
+                if(!g.has_edge(v, u) && !visited_vec[u]) {
+                    //do a dfs from this to figure out the size
+                    //of the connected component connected to the bcc through v
+                    //and this edge
+                    int cnt = 0;
+                    stack<node_id_t> S;
+                    S.push(u);
+                    visited_vec[u] = true;
+                    while(!S.empty()) {
+                        node_id_t vv = S.top();
+                        S.pop();
+                        cnt++;
+                        vector<node_id_t> nbr_vec = get_nbrs(vv);
+                        for(int i = 0; i < nbr_vec.size(); ++i) {
+                            node_id_t nbr = nbr_vec[i];
+                            if(!visited_vec[nbr]) {
+                                visited_vec[nbr] = true;
+                                S.push(nbr);
+                            }
+                        }
+                    }
+                    subgraph_sz_vec.push_back(cnt);
+                    //printf("---%d, %d", v, cnt);
+                }
+            }
+            comp.art_pt_map.insert(make_pair(v, subgraph_sz_vec));  
+        }
+        sum_v += v;
+    }
+    
+    //fix art_pt_map
+//    g.remove_edge(e.first, e.second);
+    
+    comp.subgraph.fill_graph(g);
+    printf("Sum of v: [%d]\n", sum_v);
+    
+    component_t::art_pt_map_t new_art_pt_map;
+    for(component_t::art_pt_map_t::iterator it = comp.art_pt_map.begin();
+            it != comp.art_pt_map.end();
+            ++it) {
+        node_id_t new_v = comp.subgraph.outin_label_map[it->first];
+        new_art_pt_map.insert(make_pair(new_v, it->second));
+    }
+    comp.art_pt_map = new_art_pt_map;
+    comp.sum_of_bcc = sum_v;
+    
+//    remove_edge(e.first, e.second);
 }

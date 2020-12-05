@@ -30,6 +30,9 @@
 
 using namespace std;
 
+
+
+
 void parallel_Shukla(
         vector<double>&         dBC_vec,
         component_t&            affected_Bcc,

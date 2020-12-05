@@ -164,7 +164,7 @@ void batch_Partial_BBFS_Deletion(
         for(int i = 0; i < g.nodes_vec[v_i].size(); ++i) {
             node_id_t v_n = g.nodes_vec[v_i][i];
             // For thread safety reasons, rather than delete the edge from the component
-            // don't include it in the calculation
+            // don't include it's source dependencies in the calculation if not needed
             if(edge_Should_Be_Deleted(comp, v_i, v_n))
              continue;
             if(dist_vec[v_n] < 0) {
@@ -182,22 +182,32 @@ void batch_Partial_BBFS_Deletion(
 
 void batch_iCentral_Iter(
         vector<double>& dBC_vec,    // delta BC of vertices
-        component_t&    comp,       // BCC
+        component_t    comp,        // BCC or BCC' if insertion
         node_id_t       s,          // source of the iteration
         iter_info_t&    iter_info,  // 
         operation_t     operation
         )
 {
-    iter_info.init_all(comp.subgraph.size());
+    
     if(operation == INSERTION) {
-               
+        
+        // This is BCC' remove the new edges to find proper source dependencies for G by using BBFS, RBFS
+        for(int i = 0 ; i < comp.edges_affected.size(); i++)
+        {
+//            printf("Atomic Edge: [%d], [%d]\n", comp.edges_affected[i].first, comp.edges_affected[i].second);
+            comp.subgraph.remove_edge(comp.edges_affected[i].first, comp.edges_affected[i].second);
+        }
+        iter_info.init_all(comp.subgraph.size());
+                      
         // Brandes Breadth-first search and Brandes Reverse Breadth-first Search
         BBFS(iter_info, comp, s);
         RBFS(dBC_vec, comp, s, iter_info, false, true);
+        
         batch_Partial_BBFS_Addition(iter_info, comp, s);
         RBFS(dBC_vec, comp, s, iter_info, true, false);
     } else if(operation == DELETION) {
         
+        iter_info.init_all(comp.subgraph.size());
         // Brandes Breadth-first search and Brandes Reverse Breadth-first Search
         BBFS(iter_info, comp, s);
         RBFS(dBC_vec, comp, s, iter_info, false, true);

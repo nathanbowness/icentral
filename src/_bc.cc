@@ -312,7 +312,7 @@ void BBFS(
         component_t&    comp,       // component
         node_id_t       s          // source of the iteration
         )
-{
+{    
     subgraph_t& g = comp.subgraph;
     
     vector<vector<node_id_t> >&  P = iter_info.P; 

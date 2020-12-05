@@ -11,11 +11,11 @@
             <file>file:/home/user/Desktop/icentral/test_exp.in</file>
             <file>file:/home/user/Desktop/icentral/src/graph_t.cc</file>
             <file>file:/home/user/Desktop/icentral/src/component_t.h</file>
-            <file>file:/home/user/Desktop/icentral/mpi.in</file>
+            <file>file:/home/user/Desktop/icentral/src/atomic_ICentral_Batch.h</file>
             <file>file:/home/user/Desktop/icentral/src/parallel_Shukla.h</file>
-            <file>file:/home/user/Desktop/icentral/src/main.cc</file>
-            <file>file:/home/user/Desktop/icentral/Erdos02.lcc.net</file>
-            <file>file:/home/user/Desktop/icentral/src/types.h</file>
+            <file>file:/home/user/Desktop/icentral/src/bc.h</file>
+            <file>file:/home/user/Desktop/icentral/src/subgraph_t.cc</file>
+            <file>file:/home/user/Desktop/icentral/src/_bc.cc</file>
         </group>
     </open-files>
 </project-private>
