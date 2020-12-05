@@ -92,7 +92,6 @@ void graph_t::read_graph(string path)
     for(int i = 0; i < M; ++i) {
         node_id_t src, dst;
         fin >> src >> dst;
-        //TODO could this cause issues?
         if(src < N && dst < N) {
             insert_edge(src, dst);
         }
@@ -274,7 +273,8 @@ void graph_t::tmp_fun()
 //IMP: assumes @e is not in the graph already
 void graph_t::find_edge_bcc(
                 component_t&    comp,
-                edge_t          e
+                edge_t          e,
+                string     operation
                 )
 {
     //a. find the bcc subgraph
@@ -283,17 +283,22 @@ void graph_t::find_edge_bcc(
     if(has_edge(e)) {
         printf("WARNING: inserted duplicate edge!\n");
     }
+//    printf("The edge is ([%d], [%d])\n\n", e.first, e.second);
     insert_edge(e.first, e.second);
     graph_hash_t g;
     find_edge_bcc_subgraph(g, e.first, e.second);
-    //g.remove_edge(e.first, e.second); //TODO: make sure it's okay! [NO, needed below]
+//    g.print_graph(true);
     vector<node_id_t> art_pt_vec;
+    
+    // Find all the articulation points
     find_art_points(art_pt_vec);
-    set<node_id_t> art_pt_set;//to make art points unique
+    
+    set<node_id_t> art_pt_set; //To make art points unique
     for(int i = 0; i < art_pt_vec.size(); ++i) {
         art_pt_set.insert(art_pt_vec[i]);
     }
     
+    long sum_v = 0;
     graph_hash_t::nodes_map_t::iterator it;
     for(it = g.nodes_map.begin();
         it != g.nodes_map.end();
@@ -312,7 +317,7 @@ void graph_t::find_edge_bcc(
             for(int i = 0; i < v_nbr_vec.size(); ++i) {
                 node_id_t u = v_nbr_vec[i];
                 if(!g.has_edge(v, u) && !visited_vec[u]) {
-                    //do a dfs from this guy to figure out the size
+                    //do a dfs from this to figure out the size
                     //of the connected component connected to the bcc through v
                     //and this edge
                     int cnt = 0;
@@ -336,12 +341,16 @@ void graph_t::find_edge_bcc(
                     //printf("---%d, %d", v, cnt);
                 }
             }
-            comp.art_pt_map.insert(make_pair(v, subgraph_sz_vec));
+            comp.art_pt_map.insert(make_pair(v, subgraph_sz_vec));  
         }
+        sum_v += v;
     }
+    
     //fix art_pt_map
     g.remove_edge(e.first, e.second);
+    
     comp.subgraph.fill_graph(g);
+    printf("Sum of v: [%d]\n", sum_v);
     
     component_t::art_pt_map_t new_art_pt_map;
     for(component_t::art_pt_map_t::iterator it = comp.art_pt_map.begin();
@@ -351,6 +360,7 @@ void graph_t::find_edge_bcc(
         new_art_pt_map.insert(make_pair(new_v, it->second));
     }
     comp.art_pt_map = new_art_pt_map;
+    comp.sum_of_bcc = sum_v;
     
     remove_edge(e.first, e.second);
 }

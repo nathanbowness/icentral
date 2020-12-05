@@ -168,13 +168,13 @@ void kdd_exp_main(int argc, char** argv, int rank, int size)
             string path = path_to_graphs[i].c_str();
             graph.read_graph(path);
             graph.graph_name = extract_graph_name(path_to_graphs[i]);
-            update_Graph_BC_Jamour( // Jamour's algorithm
-                graph,
-                new_edges_per_graph[i], 
-                do_brandes, 
-                num_threads,
-                op
-                );
+//            update_Graph_BC_Jamour( // Jamour's algorithm
+//                graph,
+//                new_edges_per_graph[i], 
+//                do_brandes, 
+//                num_threads,
+//                op
+//                );
             update_Graph_BC_Shukla(  // Shukla's algorithm
                 graph,
                 new_edges_per_graph[i], 

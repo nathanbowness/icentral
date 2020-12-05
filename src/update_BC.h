@@ -41,6 +41,7 @@ void update_Graph_BC_Jamour(
     MPI_Status    status;
     
     timer           tm;
+    timer           total_time;
     double          brandes_time = 1.0;
     vector<double>  BC_vec;
     vector<double>  tm_vec;
@@ -61,6 +62,7 @@ void update_Graph_BC_Jamour(
                 graph.edge_set.size(),
                 brandes_time);
     }
+    total_time.start();
     for(int i = 0; i < edges_vec.size(); ++i) {
         edge_t e = edges_vec[i];
         tm.start();
@@ -83,6 +85,7 @@ void update_Graph_BC_Jamour(
         MPI_Barrier(MPI_COMM_WORLD);
     }
     
+    total_time.stop();
     double tm_mean, tm_stddev, tm_median, tm_min, tm_max;
     double su_mean, su_stddev, su_median, su_min, su_max;
     simple_stats(tm_vec, tm_mean, tm_stddev, tm_median, tm_min, tm_max);
@@ -90,6 +93,7 @@ void update_Graph_BC_Jamour(
     
     if(rank == 0)
         printf("Avg.time[%.2f]  Avg.speed-up[%.2f]\n\n", tm_mean, su_mean);
+    printf("The Jamour total time for [%d] edges, was [%.6f]\n\n", edges_vec.size(), total_time.interval());
 }
 
 #endif /* UPDATE_BC_H */

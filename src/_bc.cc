@@ -54,13 +54,13 @@ void Update_BC(
         
         if(operation == INSERTION) {
             //IMP: assumes @e is not in @graph, @e will not be in @comp
-            graph.find_edge_bcc(comp, e);
+            graph.find_edge_bcc(comp, e, "INSERTION");
         } else if(operation == DELETION) {
             
             //IMP: assumes @e is not in @graph, @e will not be in @comp
             //     (remove @e from @graph)
             graph.remove_edge(e.first, e.second);
-            graph.find_edge_bcc(comp, e);
+            graph.find_edge_bcc(comp, e, "DELETION");
             graph.insert_edge(e.first, e.second);
         }
         
@@ -259,7 +259,7 @@ void iCentral_iter(
         iter_info_t&    iter_info,  // 
         int             dd,
         bool            use_d_1,
-        operation_t      op
+        operation_t     operation
         )
 {
     iter_info.init_all(comp.subgraph.size());
@@ -269,7 +269,7 @@ void iCentral_iter(
         e.second = tmp;
     }
     dd = abs(dd);
-    if(op == INSERTION) {
+    if(operation == INSERTION) {
         //NOTE: the d=1 optimization has a bug, however it was used in
         //      some of the performance results    
         //if(dd == 1 && use_d_1) {
@@ -282,7 +282,7 @@ void iCentral_iter(
         RBFS(dBC_vec, comp, s, iter_info, false, true);
         partial_BBFS_addition(iter_info, comp, s, e);
         RBFS(dBC_vec, comp, s, iter_info, true, false);
-    } else if(op == DELETION) {
+    } else if(operation == DELETION) {
         
         // Brandes Breadth-first search and Brandes Reverse Breadth-first Search
         BBFS(iter_info, comp, s);
@@ -358,58 +358,43 @@ void RBFS(
     vector<double>&              delta_vec = iter_info.delta_vec;
     vector<double>&              Delta_vec = iter_info.Delta_vec;
     vector<node_id_t>&           S = iter_info.S;
-    
-    fill_vec<double>(delta_vec, comp.subgraph.size(), 0);
-    
+       
    
-    if(comp.comp_type == GRAPH) {
-        for(int i = S.size()-1; i >= 0; --i) {
-            node_id_t w = S[i];
-            for (int idx = 0; idx < P[w].size(); ++idx) {
-                node_id_t v = P[w][idx];
-                delta_vec[v] += (((double) sigma_vec[v] / sigma_vec[w]) * (1 + delta_vec[w]));
-            }
-            if (w != s) {
-                if(add) dBC_vec[w] += delta_vec[w]/2.0;
-                if(sub) dBC_vec[w] -= delta_vec[w]/2.0;
+       //BCC
+    fill_vec<double>(Delta_vec, comp.subgraph.size(), 0);
+    component_t::art_pt_map_t& art_pt_map = comp.art_pt_map;
+    for(int i = S.size()-1; i >= 0; --i) {
+        node_id_t v_n = S[i];
+        if(   art_pt_map.find(s) != art_pt_map.end()
+           && art_pt_map.find(v_n) != art_pt_map.end()
+           ){
+            int VG_s, VG_n;
+            VG_s = accumulate(art_pt_map[s].begin(), art_pt_map[s].end(), 0);
+            VG_n = accumulate(art_pt_map[v_n].begin(), art_pt_map[v_n].end(), 0);
+            int c_t = VG_s*VG_n;
+            Delta_vec[v_n] =  Delta_vec[v_n] + c_t;
+        }
+        for(int i = 0; i < P[v_n].size(); ++i) {
+            node_id_t v_p = P[v_n][i];
+            double sp_sn = ((double)sigma_vec[v_p]/sigma_vec[v_n]);
+            delta_vec[v_p] = delta_vec[v_p] + sp_sn*(1+delta_vec[v_n]);
+            if(art_pt_map.find(s) != art_pt_map.end()) {
+                Delta_vec[v_p] = Delta_vec[v_p] + Delta_vec[v_n]*sp_sn;
             }
         }
-    } else if(comp.comp_type == BCC) { //BCC or MUC case: involved case, with external pairs contribution
-        fill_vec<double>(Delta_vec, comp.subgraph.size(), 0);
-        component_t::art_pt_map_t& art_pt_map = comp.art_pt_map;
-        for(int i = S.size()-1; i >= 0; --i) {
-            node_id_t v_n = S[i];
-            if(   art_pt_map.find(s) != art_pt_map.end()
-               && art_pt_map.find(v_n) != art_pt_map.end()
-               ){
-                int VG_s, VG_n;
-                VG_s = accumulate(art_pt_map[s].begin(), art_pt_map[s].end(), 0);
-                VG_n = accumulate(art_pt_map[v_n].begin(), art_pt_map[v_n].end(), 0);
-                int c_t = VG_s*VG_n;
-                Delta_vec[v_n] =  Delta_vec[v_n] + c_t;
+        if(s != v_n) {
+            if(add) dBC_vec[v_n] += delta_vec[v_n]/2.0;
+            if(sub) dBC_vec[v_n] -= delta_vec[v_n]/2.0;
+        }
+        if(art_pt_map.find(s) != art_pt_map.end()) {
+            int VG_s = accumulate(art_pt_map[s].begin(), art_pt_map[s].end(), 0);
+            if(add) {
+                dBC_vec[v_n] += delta_vec[v_n]*VG_s;
+                dBC_vec[v_n] += Delta_vec[v_n]/2.0;
             }
-            for(int i = 0; i < P[v_n].size(); ++i) {
-                node_id_t v_p = P[v_n][i];
-                double sp_sn = ((double)sigma_vec[v_p]/sigma_vec[v_n]);
-                delta_vec[v_p] = delta_vec[v_p] + sp_sn*(1+delta_vec[v_n]);
-                if(art_pt_map.find(s) != art_pt_map.end()) {
-                    Delta_vec[v_p] = Delta_vec[v_p] + Delta_vec[v_n]*sp_sn;
-                }
-            }
-            if(s != v_n) {
-                if(add) dBC_vec[v_n] += delta_vec[v_n]/2.0;
-                if(sub) dBC_vec[v_n] -= delta_vec[v_n]/2.0;
-            }
-            if(art_pt_map.find(s) != art_pt_map.end()) {
-                int VG_s = accumulate(art_pt_map[s].begin(), art_pt_map[s].end(), 0);
-                if(add) {
-                    dBC_vec[v_n] += delta_vec[v_n]*VG_s;
-                    dBC_vec[v_n] += Delta_vec[v_n]/2.0;
-                }
-                if(sub) {
-                    dBC_vec[v_n] -= delta_vec[v_n]*VG_s;
-                    dBC_vec[v_n] -= Delta_vec[v_n]/2.0;
-                }
+            if(sub) {
+                dBC_vec[v_n] -= delta_vec[v_n]*VG_s;
+                dBC_vec[v_n] -= Delta_vec[v_n]/2.0;
             }
         }
     }
@@ -425,6 +410,7 @@ void partial_BBFS_addition(
 {
     subgraph_t& g = comp.subgraph;
     
+    // Graph all the variables calculated from the BFS
     vector<vector<node_id_t> >&  P = iter_info.P; 
     vector<int>&                 path_cnt_vec = iter_info.sigma_vec;
     vector<int>&                 path_cnt_inc_map = iter_info.sigma_inc_vec;
@@ -490,11 +476,7 @@ void partial_BBFS_addition(
     }
 
 
-    //fix order of S
-    //IMP::THIS CAN BE MADE MUCH BETTER!
-    //HEAP FOR EXAMPLE
-    //EVEN THE SWAPPING CAN BE DONE MORE EFFICIENTLY
-    //for now it's not a bottleneck
+    // Fix order of S, this could be more iffecient
     for (int i = 1; i < S.size(); ++i) {
         if (dist_map[S[i - 1]] > dist_map[S[i]]) {
             int j = i;
@@ -532,7 +514,7 @@ void partial_BBFS_deletion(
     iter_info.init_all(g.size());
     // Assumes iter_info is initialized
     
-    // IMP: careful bitch, graph_t is not thread safe!
+    // IMP: careful graph_t is not thread safe!
     //g.remove_edge(e.first, e.second);
     sigma_vec[s] = 1;
     dist_vec[s] = 0;
@@ -679,48 +661,4 @@ void BBFS_RBFS_d1(
             }
         }
     }
-}
-
-
-
-
-/*
- * Parallel Brandes functions
- * Ziyad territory 
- */
-void parallel_brandes(
-        graph_t&        graph,
-        vector<double>& BC_vec
-        )
-{
-    //1. make a component (fill a subgraph)
-    //2. loop through all sources
-    BC_vec.resize(graph.size());
-    fill(BC_vec.begin(), BC_vec.end(), 0.0);
-    
-    component_t comp;
-    comp.comp_type = GRAPH;
-    comp.subgraph.fill_graph(graph);
-    
-    // we want to do brandes_iter from each node in the graph
-    // each thread will be responsible for doing brandes_iter from
-    // a subset of the nodes in the graph
-    //1. divide the nodes in the graph to vectors, each has a subset of nodes 
-    //   a thread is responsible for
-    //2. call brandes_block to get the contribution of the thread's nodes to the
-    //   final BC value (fork and join)
-    //3. accumulate the results in BC_vec
-
-}
-
-void brandes_block(
-        vector<double>*     dBC_vec,
-        component_t*        comp,
-        vector<node_id_t>*  source_vec
-        )
-{
-//    iter_info_t iter_info;
-//    for(node_id_t s = 0; s < comp.subgraph.size(); ++s) {
-//        brandes_iter(BC_vec, comp, s, iter_info);
-//    }
 }

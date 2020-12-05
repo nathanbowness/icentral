@@ -26,6 +26,25 @@ struct component_t {
     art_pt_map_t    art_pt_map;
     comp_type_t     comp_type;
     
+    vector<edge_t>  edges_affected;
+    vector<node_id_t> nodes_affected;
+    long sum_of_bcc = 0;
+    
+    void add_Affected_Node(node_id_t node) {
+        bool already_Added = false;
+        for(int i = 0; i < nodes_affected.size(); ++i) {
+            if(nodes_affected[i] == node)
+            {
+                already_Added = true;
+                break;
+            }
+        }
+        
+        if (!already_Added)
+            nodes_affected.push_back(node);
+        
+    }
+    
     void print()
     {
         printf("\n");
@@ -37,6 +56,14 @@ struct component_t {
                 printf("\t%d", it->second[i]);
             }
             printf("\n");
+        }
+        for(int i =0; i < edges_affected.size(); i++) {
+            printf("Edges that will be removed/inserted [%d],[%d]\n", 
+                    edges_affected[i].first, edges_affected[i].second);
+        }
+        for(int i =0; i < nodes_affected.size(); i++) {
+//            printf("Nodes that  will be affected [%d]\n", 
+//                    nodes_affected[i]);
         }
     }
 };

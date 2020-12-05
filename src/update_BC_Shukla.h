@@ -26,8 +26,39 @@
 #include "experiments.h"
 #include "utility.h"
 #include "types.h"
+#include "parallel_Shukla.h"
 
 #include <mpi.h>
+
+using namespace std;
+
+void add_Affected_BCC(vector<component_t>& affected_Bccs, edge_t& e, component_t& comp){
+//    printf("\nComponents Sum [%d]\n", comp.sum_of_bcc);
+    if(affected_Bccs.size() == 0) {
+        comp.edges_affected.push_back(e);
+        affected_Bccs.push_back(comp);
+    } 
+    else 
+    {
+        bool found = false;
+        // Other wise need to check if the BCC has already been added to the affected list
+        for(int j = 0; j < affected_Bccs.size(); j++) {
+            
+            if(affected_Bccs[j].sum_of_bcc == comp.sum_of_bcc)
+            {
+                affected_Bccs[j].edges_affected.push_back(e);
+                found = true;
+                break;
+            } 
+        }
+        
+        if(!found)
+        {
+            comp.edges_affected.push_back(e);
+            affected_Bccs.push_back(comp);
+        }
+    }
+}
 
 /*
  * Update a graphs Betweenness Centrality values using Jamour's algorithm
@@ -38,7 +69,7 @@ void update_Graph_BC_Shukla(
             vector<edge_t> edges_vec,
             bool            compare_with_brandes = true,
             int             num_threads = 1,
-            operation_t     op = INSERTION
+            operation_t     operation = INSERTION
         )
 {
     int rank, size;
@@ -47,6 +78,8 @@ void update_Graph_BC_Shukla(
     MPI_Status    status;
     
     timer           tm;
+    timer           tm_findBCC;
+    timer           tm_UpdateBCC;
     double          brandes_time = 1.0;
     vector<double>  BC_vec;
     vector<double>  tm_vec;
@@ -55,55 +88,114 @@ void update_Graph_BC_Shukla(
     BC_vec.resize(graph.size());
     if(compare_with_brandes) {
         tm.start();
-        fast_brandes_BC(graph, BC_vec);  // this is faster, uses components
+//        fast_brandes_BC(graph, BC_vec);  // this is faster, uses components
 //        BC_vec = brandes_bc(graph);
         tm.stop();
         brandes_time = tm.interval();
     }
     if(rank == 0) {
-        printf("Graph[%s]  V[%d]  E[%d]  Brandes_time[%.2f]\n",
+        printf("Graph[%s]  V[%d]  E[%d]  Brandes_time[%.6f]\n",
                 graph.graph_name.c_str(),
                 graph.size(),
                 graph.edge_set.size(),
                 brandes_time);
     }
     
-    // Here we should potentially add all edges to the graph? At once?
-            // in Update_BC, we find the BCC the affected node is in
+    tm.start();
+    tm_findBCC.start();
     
+    // Array of BCCs that have been affected, these are BCC in G (but were found in G')
+    vector<component_t> affected_Bccs;
     
-    
+    printf("Number of edges to insert [%d]\n", edges_vec.size());
+    printf("Find all the affected BCCs\n");
+    // Find all the affected BCCs for the edges
     for(int i = 0; i < edges_vec.size(); ++i) {
+        
         edge_t e = edges_vec[i];
         
-        tm.start();
-        Update_BC(BC_vec, graph, BCC, e, num_threads, op); // Use BCC for the algorithm
-        tm.stop();
-        double e_time = tm.interval();
-        tm_vec.push_back(e_time);
-        double e_speedup = brandes_time/e_time;
-        speedup_vec.push_back(e_speedup);
+        // biconnected component of G' that edge e belongs to
+        component_t comp;
+        comp.comp_type = BCC;
         
-        if(rank == 0) {
-            printf("e(%-6d,%-6d)  time[%.2f]  speed-up[%.2f]\n",
-                    e.first,
-                    e.second,
-                    e_time,
-                    e_speedup);
+        if(operation == INSERTION) {
+            //IMP: assumes @e is not in @graph, @e will not be in @comp
+            graph.find_edge_bcc(comp, e, "INSERTION");
+        } else if(operation == DELETION) {
+            
+            //IMP: assumes @e is not in @graph, @e will not be in @comp
+            //     (remove @e from @graph)
+            graph.remove_edge(e.first, e.second);
+            graph.find_edge_bcc(comp, e, "DELETION");
+            graph.insert_edge(e.first, e.second);
         }
-
-        //synchronization barrier so no one starts next edge before others
-        MPI_Barrier(MPI_COMM_WORLD);
+        
+        //map @e to the new edge in the comp
+        e.first  = comp.subgraph.outin_label_map[e.first];
+        e.second = comp.subgraph.outin_label_map[e.second];
+        
+        if(operation == DELETION) {
+            // Add back in the edge, so this is BCC (not BCC')
+            comp.subgraph.insert_edge(e.first, e.second);
+        }
+        
+        // Add the biconnected component to the list of affected BCCs
+        add_Affected_BCC(affected_Bccs, e, comp);
     }
     
-    double tm_mean, tm_stddev, tm_median, tm_min, tm_max;
-    double su_mean, su_stddev, su_median, su_min, su_max;
-    simple_stats(tm_vec, tm_mean, tm_stddev, tm_median, tm_min, tm_max);
-    simple_stats(speedup_vec, su_mean, su_stddev, su_median, su_min, su_max);
+    tm_findBCC.stop();
+    printf("There are [%d] affected BCCs\n", affected_Bccs.size());
+    printf("time[%.6f] for Finding Affected BCC \n", tm_findBCC.interval());
+    printf("Find all the affected Nodes\n");
+    // Find the affected nodes within each of the subgraphs
+    // TODO: could parallelize this, to update each BCC on different threads
     
-    if(rank == 0)
-        printf("Avg.time[%.2f]  Avg.speed-up[%.2f]\n\n", tm_mean, su_mean);
+    timer tm_To_Find_Nodes;
+    tm_To_Find_Nodes.start();
+    find_Affected_Nodes(affected_Bccs);
+    tm_To_Find_Nodes.stop();
+    printf("Time[%.6f] to find the affected Nodes shukla\n", tm_To_Find_Nodes.interval());
+    
+//    for(int z = 0; z < affected_Bccs.size(); ++z) {
+//        printf("Printing BCC [%d]\n", z);
+//        affected_Bccs[z].print();
+//    }
+    
+    tm_UpdateBCC.start();
+    
+    vector<double> dBC_vec;
+    for(int i = 0; i < affected_Bccs.size(); i++)
+    {
+        timer tm_interval;
+        tm_interval.start();
+        // for each affected BCC S in G, remove the source dependencies
+        // for each affected BCC S' in G', add the source dependencies
+        parallel_Shukla(dBC_vec, affected_Bccs[i], num_threads, operation);
+        
+        tm_interval.stop();
+        printf("Time to finish updating BCC: [%d], it took  [%.6f]\n", i, tm_interval.interval());
+    }
+    
+    tm_UpdateBCC.stop();
+    printf("Time to update BC in nodes [%.6f] for shukla\n", tm_UpdateBCC.interval());
+    
+    tm.stop();
+    double e_time = tm.interval();
+    double e_speedup = brandes_time/e_time;
+    printf("time[%.6f]  speed-up[%.6f]\n", e_time, e_speedup);
+    
+//     print all the affected Bccs
+    
+    
+    
+    
+    // Printing info -- uncomment eventually
+    
+//    double tm_mean, tm_stddev, tm_median, tm_min, tm_max;
+//    simple_stats(tm_vec, tm_mean, tm_stddev, tm_median, tm_min, tm_max);
 }
+
+
 
 #endif /* UPDATE_BC_SHUKLA_H */
 

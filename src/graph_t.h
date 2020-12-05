@@ -359,7 +359,8 @@ struct graph_t {
     
     void    find_edge_bcc(
                 component_t&    comp,
-                edge_t          e
+                edge_t          e,
+                string     operation
                 );
     
     //incremental bc with bcc stuff

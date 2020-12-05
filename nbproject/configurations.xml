@@ -4,12 +4,15 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>src/atomic_ICentral_Batch.h</itemPath>
       <itemPath>src/bc.h</itemPath>
       <itemPath>src/component_t.h</itemPath>
+      <itemPath>src/create_Guid.h</itemPath>
       <itemPath>src/experiments.h</itemPath>
       <itemPath>src/graph_t.h</itemPath>
       <itemPath>src/iter_info_t.h</itemPath>
       <itemPath>src/mcb_find.h</itemPath>
+      <itemPath>src/parallel_Shukla.h</itemPath>
       <itemPath>src/types.h</itemPath>
       <itemPath>src/unit_tests.h</itemPath>
       <itemPath>src/update_BC.h</itemPath>
@@ -84,6 +87,8 @@
       </item>
       <item path="src/_bc_mem.cc" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/atomic_ICentral_Batch.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/bc.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/bc.h" ex="false" tool="3" flavor2="0">
@@ -95,6 +100,8 @@
       <item path="src/bicon.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/component_t.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/create_Guid.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/experiments.cc" ex="false" tool="1" flavor2="0">
       </item>
@@ -117,6 +124,8 @@
       <item path="src/mcb_find.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/paper_exp.cc" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/parallel_Shukla.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/qube.cc" ex="false" tool="1" flavor2="0">
       </item>
@@ -154,6 +163,8 @@
       </item>
       <item path="src/_bc_mem.cc" ex="false" tool="1" flavor2="0">
       </item>
+      <item path="src/atomic_ICentral_Batch.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="src/bc.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/bc.h" ex="false" tool="3" flavor2="0">
@@ -165,6 +176,8 @@
       <item path="src/bicon.cc" ex="false" tool="1" flavor2="0">
       </item>
       <item path="src/component_t.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/create_Guid.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/experiments.cc" ex="false" tool="1" flavor2="0">
       </item>
@@ -187,6 +200,8 @@
       <item path="src/mcb_find.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/paper_exp.cc" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/parallel_Shukla.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/qube.cc" ex="false" tool="1" flavor2="0">
       </item>

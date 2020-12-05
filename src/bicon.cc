@@ -183,7 +183,6 @@ void graph_t::find_edge_bcc_subgraph(graph_hash_t& bcc, node_id_t src, node_id_t
     
     //(src, dst) needs to be the first edge to recurse from
     //IMP: explain this clearly
-    //Jun 16, 2014.. I have no idea why!
     for(int i = 0; i < nodes_vec[src].nbrs_vec.size(); ++i) {
         if(nodes_vec[src].nbrs_vec[i] == dst) {
             nodes_vec[src].nbrs_vec[i] = nodes_vec[src].nbrs_vec[0];
