@@ -49,7 +49,7 @@ void update_Graph_BC(
     BC_vec.resize(graph.size());
     if(compare_with_brandes) {
         tm.start();
-//        fast_brandes_BC(graph, BC_vec);  // this is faster, uses components
+        fast_brandes_BC(graph, BC_vec);  // this is faster, uses components
 //        BC_vec = brandes_bc(graph);
         tm.stop();
         brandes_time = tm.interval();
@@ -80,7 +80,7 @@ void update_Graph_BC(
 //                    e_speedup);
 //        }
 
-        //synchronization barrier so no one starts next edge before others
+        // Synchronization barrier so no one starts next edge before others
         MPI_Barrier(MPI_COMM_WORLD);
     }
     

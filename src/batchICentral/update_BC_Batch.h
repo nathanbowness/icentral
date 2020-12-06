@@ -176,7 +176,7 @@ void update_Graph_BC_Batch(
     printf("Time to update BC in nodes [%.6f] for batch iCentral\n", tm_UpdateBCC.interval());
     
     overall_Time.stop();
-    printf("The overall time to update BC in nodes [%.6f] for batch iCentral\n", tm_UpdateBCC.interval());
+    printf("The overall time to update BC in nodes [%.6f] for batch iCentral\n", overall_Time.interval());
 }
 
 

@@ -131,7 +131,7 @@ void parallel_Shukla(
         }
     }
 
-    // Write the delta BC for each node to a file
+    // Write the delta BC for each BCC to a file
     FILE* fout = fopen("dBC_whole_batch", "w");
     for(int i = 0; i < dBC_vec.size(); ++i) {
         fprintf(fout, "%f\n", dBC_vec[i]);
