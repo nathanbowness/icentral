@@ -30,6 +30,14 @@ struct timer {
 	}
 };
 
+void gen_rand_edges(int num_edges,
+        graph_t& graph,
+        vector<edge_t>& out_vec);
+
+void gen_rand_edges_deletions(int num_edges,
+        graph_t& graph,
+        vector<edge_t>& out_vec);
+
 void simple_stats(vector<double> vec,
         double& mean,
         double& stddev,

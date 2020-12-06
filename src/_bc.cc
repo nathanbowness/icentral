@@ -199,35 +199,35 @@ void parallel_iCentral(
         }
     }
     
-    /// For MPI programming this section must be uncommented ---
-    
-    //now dBC_vec of each machine is ready.
-    //master gets and accumulates all dBC_vec from everyone
-//    printf("R[%d] done\n", rank);
-//    if(rank == 0) {
-//        //receive dBC_vec from everyone and accumulate
-//        timer tm;
-//        tm.start();
-//        vector<double> rcv_dBC_vec;
-//        rcv_dBC_vec.resize(dBC_vec.size());
-//        for(int p = 1; p < size; ++p) {
-//            MPI_Recv(&rcv_dBC_vec[0], rcv_dBC_vec.size(), MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-//            for(int i = 0; i < dBC_vec.size(); ++i) {
-//                dBC_vec[i] += rcv_dBC_vec[i];
-//            }
-//        }
-//        tm.stop();
-//        printf("\t\tR[0] -- Accumulation time: [%f]\n", rank, tm.interval());
-//    } else {
-//        //just send dBC_vec
-//        MPI_Send(&dBC_vec[0], dBC_vec.size(), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
-//    }
-    
-    /// --- For MPI programming above this section should be commented out
-    
+    /// For MPI programming this flag must be set to true
+    bool mpiProgramming = false;
+    if (mpiProgramming)
+    {
+        //now dBC_vec of each machine is ready.
+        //master gets and accumulates all dBC_vec from everyone
+        printf("R[%d] done\n", rank);
+        if(rank == 0) {
+            //receive dBC_vec from everyone and accumulate
+            timer tm;
+            tm.start();
+            vector<double> rcv_dBC_vec;
+            rcv_dBC_vec.resize(dBC_vec.size());
+            for(int p = 1; p < size; ++p) {
+                MPI_Recv(&rcv_dBC_vec[0], rcv_dBC_vec.size(), MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+                for(int i = 0; i < dBC_vec.size(); ++i) {
+                    dBC_vec[i] += rcv_dBC_vec[i];
+                }
+            }
+            tm.stop();
+            printf("\t\tR[%d] -- Accumulation time: [%f]\n", rank, tm.interval());
+        } else {
+            //just send dBC_vec
+            MPI_Send(&dBC_vec[0], dBC_vec.size(), MPI_DOUBLE, 0, 0, MPI_COMM_WORLD);
+        }
+    }    
     
     // Write the delta BC for each node to a file
-    FILE* fout = fopen("dBC", "w");
+    FILE* fout = fopen("dBC_single_edge", "w");
     for(int i = 0; i < dBC_vec.size(); ++i) {
         fprintf(fout, "%f\n", dBC_vec[i]);
     }

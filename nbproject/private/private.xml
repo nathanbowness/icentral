@@ -7,14 +7,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/user/Desktop/icentral/src/update_BC_Shukla.h</file>
             <file>file:/home/user/Desktop/icentral/test_exp.in</file>
             <file>file:/home/user/Desktop/icentral/src/graph_t.cc</file>
-            <file>file:/home/user/Desktop/icentral/src/component_t.h</file>
-            <file>file:/home/user/Desktop/icentral/src/atomic_ICentral_Batch.h</file>
-            <file>file:/home/user/Desktop/icentral/src/parallel_Shukla.h</file>
-            <file>file:/home/user/Desktop/icentral/src/bc.h</file>
-            <file>file:/home/user/Desktop/icentral/src/subgraph_t.cc</file>
+            <file>file:/home/user/Desktop/icentral/src/main.cc</file>
+            <file>file:/home/user/Desktop/icentral/src/iCentral/update_BC.h</file>
+            <file>file:/home/user/Desktop/icentral/src/batchICentral/update_BC_Batch.h</file>
+            <file>file:/home/user/Desktop/icentral/src/batchICentral/parallel_Batch_BC.h</file>
             <file>file:/home/user/Desktop/icentral/src/_bc.cc</file>
         </group>
     </open-files>

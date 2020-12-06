@@ -106,7 +106,6 @@ void graph_t::find_edge_bcc(bcc_delta_t&  bcc,
 }
 
 //////////////////////////////////////////////////
-//IMP:: FOR NOW THIS GUY DOESN'T USE fast_subgraph
 //////////////////////////////////////////////////
 void bcc_delta_t::compute_bc(tr1_map_t(double)& bc_map,
                         node_id_t src,

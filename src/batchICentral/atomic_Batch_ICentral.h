@@ -5,8 +5,8 @@
  * Created on November 29, 2020, 8:32 PM
  */
 
-#ifndef ATOMIC_ICENTRAL_BATCH_H
-#define ATOMIC_ICENTRAL_BATCH_H
+#ifndef ATOMIC_BATCH_ICENTRAL_H
+#define ATOMIC_BATCH_ICENTRAL_H
 
 #include <iostream>
 #include <stdio.h>
@@ -16,8 +16,8 @@
 #include <numeric>
 #include <cmath>
 
-#include "bc.h"
-#include "utility.h"
+#include "../bc.h"
+#include "../utility.h"
 
 #include <thread>
 #include <mpi.h>

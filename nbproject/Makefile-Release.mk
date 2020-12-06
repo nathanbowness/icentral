@@ -36,19 +36,14 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/src/_bc.o \
-	${OBJECTDIR}/src/_bc_mem.o \
 	${OBJECTDIR}/src/bc.o \
 	${OBJECTDIR}/src/bcc_delta.o \
 	${OBJECTDIR}/src/bcc_scratch.o \
 	${OBJECTDIR}/src/bicon.o \
-	${OBJECTDIR}/src/experiments.o \
 	${OBJECTDIR}/src/graph_hash_t.o \
 	${OBJECTDIR}/src/graph_t.o \
 	${OBJECTDIR}/src/iter_info_t.o \
 	${OBJECTDIR}/src/main.o \
-	${OBJECTDIR}/src/mcb_find.o \
-	${OBJECTDIR}/src/paper_exp.o \
-	${OBJECTDIR}/src/qube.o \
 	${OBJECTDIR}/src/subgraph_t.o \
 	${OBJECTDIR}/src/utility.o
 
@@ -82,11 +77,6 @@ ${OBJECTDIR}/src/_bc.o: src/_bc.cc
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/_bc.o src/_bc.cc
 
-${OBJECTDIR}/src/_bc_mem.o: src/_bc_mem.cc
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/_bc_mem.o src/_bc_mem.cc
-
 ${OBJECTDIR}/src/bc.o: src/bc.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -107,11 +97,6 @@ ${OBJECTDIR}/src/bicon.o: src/bicon.cc
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bicon.o src/bicon.cc
 
-${OBJECTDIR}/src/experiments.o: src/experiments.cc
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/experiments.o src/experiments.cc
-
 ${OBJECTDIR}/src/graph_hash_t.o: src/graph_hash_t.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
@@ -131,21 +116,6 @@ ${OBJECTDIR}/src/main.o: src/main.cc
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.cc
-
-${OBJECTDIR}/src/mcb_find.o: src/mcb_find.cc
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/mcb_find.o src/mcb_find.cc
-
-${OBJECTDIR}/src/paper_exp.o: src/paper_exp.cc
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/paper_exp.o src/paper_exp.cc
-
-${OBJECTDIR}/src/qube.o: src/qube.cc
-	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} "$@.d"
-	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/qube.o src/qube.cc
 
 ${OBJECTDIR}/src/subgraph_t.o: src/subgraph_t.cc
 	${MKDIR} -p ${OBJECTDIR}/src

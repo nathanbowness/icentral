@@ -15,11 +15,10 @@
 #include <algorithm>
 #include <cmath>
 
-#include "graph_t.h"
-#include "bc.h"
-#include "experiments.h"
-#include "utility.h"
-#include "types.h"
+#include "../graph_t.h"
+#include "../bc.h"
+#include "../utility.h"
+#include "../types.h"
 
 #include <mpi.h>
 
@@ -27,7 +26,7 @@
  * Update a graphs Betweenness Centrality values using Jamour's algorithm
  * Output the timing details as well
  */
-void update_Graph_BC_Jamour(
+void update_Graph_BC(
             graph_t         graph,
             vector<edge_t> edges_vec,
             bool            compare_with_brandes = true,
@@ -50,7 +49,7 @@ void update_Graph_BC_Jamour(
     BC_vec.resize(graph.size());
     if(compare_with_brandes) {
         tm.start();
-        fast_brandes_BC(graph, BC_vec);  // this is faster, uses components
+//        fast_brandes_BC(graph, BC_vec);  // this is faster, uses components
 //        BC_vec = brandes_bc(graph);
         tm.stop();
         brandes_time = tm.interval();
@@ -73,13 +72,13 @@ void update_Graph_BC_Jamour(
         double e_speedup = brandes_time/e_time;
         speedup_vec.push_back(e_speedup);
         
-        if(rank == 0) {
-            printf("e(%-6d,%-6d)  time[%.2f]  speed-up[%.2f]\n",
-                    e.first,
-                    e.second,
-                    e_time,
-                    e_speedup);
-        }
+//        if(rank == 0) {
+//            printf("e(%-6d,%-6d)  time[%.2f]  speed-up[%.2f]\n",
+//                    e.first,
+//                    e.second,
+//                    e_time,
+//                    e_speedup);
+//        }
 
         //synchronization barrier so no one starts next edge before others
         MPI_Barrier(MPI_COMM_WORLD);

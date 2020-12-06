@@ -1,6 +1,6 @@
 /* 
  * File:   graph_t.cc
- * Author: fuad
+ * Author: fuad, modified by Nathan Bowness
  * 
  * Created on January 6, 2014, 7:55 AM
  */
@@ -13,7 +13,6 @@
 
 
 #include "graph_t.h"
-#include "mcb_find.h"
 #include "bc.h"
 #include "utility.h"
 
@@ -260,13 +259,6 @@ void graph_t::init_bc()
     }    
 }
 
-void graph_t::tmp_fun()
-{
-    print_edgelist();
-    printf("===================\n");
-    print_mucs(false);
-}
-
 /************************************************************/
 /************************************************************/
 
@@ -284,11 +276,10 @@ void graph_t::find_edge_bcc(
     if(has_edge(e)) {
         printf("WARNING: inserted duplicate edge!\n");
     }
-//    printf("The edge is ([%d], [%d])\n\n", e.first, e.second);
     insert_edge(e.first, e.second);
     graph_hash_t g;
     find_edge_bcc_subgraph(g, e.first, e.second);
-//    g.print_graph(true);
+
     vector<node_id_t> art_pt_vec;
     
     // Find all the articulation points
@@ -339,7 +330,6 @@ void graph_t::find_edge_bcc(
                         }
                     }
                     subgraph_sz_vec.push_back(cnt);
-                    //printf("---%d, %d", v, cnt);
                 }
             }
             comp.art_pt_map.insert(make_pair(v, subgraph_sz_vec));  
@@ -351,7 +341,7 @@ void graph_t::find_edge_bcc(
     g.remove_edge(e.first, e.second);
     
     comp.subgraph.fill_graph(g);
-    printf("Sum of v: [%d]\n", sum_v);
+//    printf("Graph BCC ID: [%d]\n", sum_v);
     
     component_t::art_pt_map_t new_art_pt_map;
     for(component_t::art_pt_map_t::iterator it = comp.art_pt_map.begin();
@@ -376,11 +366,6 @@ void graph_t::find_edge_bcc_prime(
     //a. find the bcc subgraph G'
     //b. find the articulation points in bcc
     //c. find the sizes of the subgraphs connected to each art point
-//    if(has_edge(e)) {
-//        printf("It has been inserted\n");
-//    }
-//    printf("The edge is ([%d], [%d])\n\n", e.first, e.second);
-//    insert_edge(e.first, e.second);
     graph_hash_t g;
     find_edge_bcc_subgraph(g, e.first, e.second);
 //    g.print_graph(true);
@@ -434,7 +419,6 @@ void graph_t::find_edge_bcc_prime(
                         }
                     }
                     subgraph_sz_vec.push_back(cnt);
-                    //printf("---%d, %d", v, cnt);
                 }
             }
             comp.art_pt_map.insert(make_pair(v, subgraph_sz_vec));  
@@ -442,11 +426,8 @@ void graph_t::find_edge_bcc_prime(
         sum_v += v;
     }
     
-    //fix art_pt_map
-//    g.remove_edge(e.first, e.second);
-    
     comp.subgraph.fill_graph(g);
-    printf("Sum of v: [%d]\n", sum_v);
+//    printf("Graph BCC ID: [%d]\n", sum_v);
     
     component_t::art_pt_map_t new_art_pt_map;
     for(component_t::art_pt_map_t::iterator it = comp.art_pt_map.begin();
@@ -457,6 +438,4 @@ void graph_t::find_edge_bcc_prime(
     }
     comp.art_pt_map = new_art_pt_map;
     comp.sum_of_bcc = sum_v;
-    
-//    remove_edge(e.first, e.second);
 }
