@@ -23,8 +23,6 @@ void printExpectedArguments(int rank){
         printf("Pass one parameter, path with experiment details\n");
         printf("deletion\n");
         printf("num_edges, num_threads, rand_seed\n");
-        printf("external_edges, do_icent, do_bcc_icent\n");
-        printf("do_fast_brandes, do_brandes, do_qube, do_inc_qube\n");
         printf("list of graph paths\n");
         printf("if external_edges is nonzero a file with graph_name.edges is expected\n");
         printf("external edges are assumed to be in the graph\n");
@@ -65,8 +63,6 @@ void createRandomEdgesFromSeed(int rank, int size, int num_edges, int rand_seed,
 void kdd_exp_main(int argc, char** argv, int rank, int size)
 {
     int                     num_edges, num_threads, rand_seed;
-    bool                    do_icent, do_bcc_icent, edges_from_file;
-    bool                    do_fast_brandes, do_brandes, do_qube, do_inc_qube;
     operation_t             op;
     vector<string>          path_to_graphs;
     vector<vector<edge_t> > new_edges_per_graph;
@@ -90,16 +86,6 @@ void kdd_exp_main(int argc, char** argv, int rank, int size)
         printf("Modifying [%d edges]\n", num_edges);
         printf("Starting with [%d threads]\n", num_threads);
         printf("Starting with [%d as rand_seed]\n", rand_seed);
-        int t1, t2, t3, t4;
-        fscanf(fin, "%d, %d, %d;", &t1, &t2, &t3);
-        edges_from_file = (t1 != 0);
-        do_icent        = (t2 != 0);
-        do_bcc_icent    = (t3 != 0);
-        fscanf(fin, "%d, %d, %d, %d;", &t1, &t2, &t3, &t4);
-        do_fast_brandes = (t1 != 0);
-        do_brandes      = (t2 != 0);
-        do_qube         = (t3 != 0);
-        do_inc_qube     = (t4 != 0);
         
         char buff[1024*4];
         while(fscanf(fin, "%s", buff) != EOF) {
@@ -114,42 +100,40 @@ void kdd_exp_main(int argc, char** argv, int rank, int size)
                 path_to_graphs, new_edges_per_graph, status);
     }
       
-    if(do_bcc_icent) {
-        if(rank == 0) {
-            printf("\n\n\n");
-            printf("Starting BCC+iCentral [%d threads] [%s]...\n", num_threads, (op==DELETION?"DELETION":"INSERTION"));
-            printf("========================================\n");
-        }
-        for(int i = 0; i < path_to_graphs.size(); ++i) {
-            graph_t graph;
-            string path = path_to_graphs[i].c_str();
-            graph.read_graph(path);
-            graph.graph_name = extract_graph_name(path_to_graphs[i]);
-            update_Graph_BC( // Jamour's algorithm
-                graph,
-                new_edges_per_graph[i], 
-                do_brandes, 
-                num_threads,
-                op
-                );
-            // Synchronization barrier so that no one starts the batch algorithm before others
-            MPI_Barrier(MPI_COMM_WORLD);
-            
-            update_Graph_BC_Batch(  // Algorithm based on Shukla's implementation
-                graph,
-                new_edges_per_graph[i], 
-                num_threads,
-                op
-                );
-            // Synchronization barrier so that no one starts next graph before others
-            MPI_Barrier(MPI_COMM_WORLD);
-        }
+
+    if(rank == 0) {
+        printf("\n\n\n");
+        printf("Starting BCC+iCentral [%d threads] [%s]...\n", num_threads, (op==DELETION?"DELETION":"INSERTION"));
+        printf("========================================\n");
+    }
+    for(int i = 0; i < path_to_graphs.size(); ++i) {
+        graph_t graph;
+        string path = path_to_graphs[i].c_str();
+        graph.read_graph(path);
+        graph.graph_name = extract_graph_name(path_to_graphs[i]);
+        update_Graph_BC( // Jamour's algorithm
+            graph,
+            new_edges_per_graph[i], 
+            true, 
+            num_threads,
+            op
+            );
+        // Synchronization barrier so that no one starts the batch algorithm before others
+        MPI_Barrier(MPI_COMM_WORLD);
+
+        update_Graph_BC_Batch(  // Algorithm based on Shukla's implementation
+            graph,
+            new_edges_per_graph[i], 
+            num_threads,
+            op
+            );
+        // Synchronization barrier so that no one starts next graph before others
+        MPI_Barrier(MPI_COMM_WORLD);
     }
 }
 
 int main( int argc, char *argv[] )
 {
-    int i;
     int rank;
     int size;
     MPI_Status    status;

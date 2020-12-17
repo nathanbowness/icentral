@@ -1,5 +1,7 @@
 1;
 10, 3, 1111;
-0, 0, 1;
-0, 1, 0, 0;
 /home/user/Desktop/icentral/graphs/Erdos02.lcc.net
+/home/user/Desktop/icentral/graphs/bio-grid-human.edges
+/home/user/Desktop/icentral/graphs/bio-grid-mouse.edges
+/home/user/Desktop/icentral/graphs/road-minnesota.mtx
+/home/user/Desktop/icentral/graphs/road-euroroad.edges
